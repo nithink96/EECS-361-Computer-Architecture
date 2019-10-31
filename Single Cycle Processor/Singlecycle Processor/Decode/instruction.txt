@@ -1,0 +1,41 @@
+R-type 
+opcode 000000  functioncode 100000 add
+                            100001 addu
+                            100100 and           
+                            100101 or
+                            000000 sll            
+                            101010 slt            
+                            101011 sltu                    
+                            100010 sub
+                            100011 subu
+func(5)=0-->sll
+func(3)=1-->func(0)=0-->slt
+         -->func(0)=1-->sltu
+func(3)=0 and func(1)=1-->sub 
+func(3)=0 and func(1)=0-->add         
+func(2)=0 and func(0)=0-->and
+func(2)=0 and func(0)=1-->or
+
+I-type 
+opcode 000100 beq
+       000101 bne
+       000111 bgtz
+       001000 addi
+       100011 lw
+       101011 sw
+
+we don't have ori, so ALUOP(1)=0
+ALUOP= 000--->branch    --->alu sub
+       001--->lw/sw/addi--->alu add
+       100--->R type
+
+ALUctr=
+010 add
+110 sub
+001 or
+111 slt
+011 sltu
+100 sll
+000 and
+
+       

@@ -1,0 +1,66 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+library work;
+use work.all;
+
+
+entity getJumpAddress is
+port(
+	A: in std_logic_vector(15 downto 0);
+	B: in std_logic_vector(31 downto 0);
+	C: out std_logic_vector( 31 downto 0)
+);
+end entity;
+
+architecture structural of getJumpAddress is
+signal ones: std_logic_vector(31 downto 0):= (others=>'1');
+signal zeros: std_logic_vector(31 downto 0):= (others=>'0');
+signal branch_offset: std_logic_vector(31 downto 0);
+signal carryout, overflow: std_logic;
+
+component adder32 is 
+port(
+	A: in std_logic_vector (31 downto 0);
+	B: in std_logic_vector(31 downto 0);
+	carryIn: in std_logic;
+	carryOut: out std_logic;
+	overFlow: out std_logic;
+	result: out std_logic_vector(31 downto 0)
+	);
+
+end component;
+
+component and_gate is
+	  port (
+	    x   : in  std_logic;
+	    y   : in  std_logic;
+	    z   : out std_logic
+	  );
+	end component;
+
+	component or_gate is
+	  port (
+	    x   : in  std_logic;
+	    y   : in  std_logic;
+	    z   : out std_logic
+	  );
+	end component;
+	
+begin
+
+genX1: for i in 0 to 1 generate
+	or1: or_gate port map('0','0', branch_offset(i));
+end generate genX1;
+
+genX2: for i in 2 to 17 generate
+	or2: or_gate port map('0', A(i-2), branch_offset(i) );
+end generate genX2;
+
+genX3: for i in 18 to 31 generate
+	or3: or_gate port map('0', A(15), branch_offset(i));
+end generate genX3;
+
+ADDER: adder32 port map(branch_offset,B, '0',carryout,overflow,C);
+
+end architecture structural;
+

@@ -1,0 +1,246 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use work.eecs361_gates.all;
+
+
+
+entity datapath is
+generic(mem_file: string);
+port(
+		clk: in std_logic;
+		reset: in std_logic
+		);
+end entity datapath;
+
+architecture structural of datapath is
+
+component main_control is
+port (
+    opcode : in  std_logic_vector(5 downto 0);
+    RegDst  : out std_logic;
+    ALUSrc : out std_logic;
+    MemtoReg : out std_logic;
+    RegWr: out std_logic;
+    MemWr: out std_logic;
+    Branch: out std_logic;
+    Jump: out std_logic;
+    ExtOp: out std_logic;
+    ALUop: out std_logic_vector(2 downto 0)
+  ); 
+end component;
+
+component ALU_control_new is
+port (
+    opcode: in std_logic_vector(5 downto 0);
+    func : in  std_logic_vector(5 downto 0);
+    ALUop: in std_logic_vector(2 downto 0);
+    ALUctr: out std_logic_vector(2 downto 0)
+  ); 
+end component;
+component ALU is 
+port(
+	A: in std_logic_vector (31 downto 0);
+	B: in std_logic_vector(31 downto 0);
+	ctrl: in std_logic_vector(2 downto 0);
+	carryOut: out std_logic;
+	overFlow: out std_logic;
+	zero: out std_logic;
+	result: out std_logic_vector(31 downto 0)
+	);
+
+end component;
+component register_file is
+     port(
+     clk: in std_logic;
+     reset: in std_logic;
+     write_enable: in std_logic;
+     Ra : in std_logic_vector(4 downto 0);
+     Rb : in std_logic_vector(4 downto 0);
+     Rw : in std_logic_vector(4 downto 0);
+         data_in: in std_logic_vector(31 downto 0);
+         outA: out std_logic_vector(31 downto 0);
+     outB: out std_logic_vector(31 downto 0));
+end component;
+component mux_n is
+  generic (
+    n   : integer
+  );
+  port (
+    sel   : in  std_logic;
+    src0  : in  std_logic_vector(n-1 downto 0);
+    src1  : in  std_logic_vector(n-1 downto 0);
+    z     : out std_logic_vector(n-1 downto 0)
+  );
+end component;
+component signExtender is
+    port(
+        A: in std_logic_vector(15 downto 0);
+        B: out std_logic_vector(31 downto 0)
+        );
+end component;
+component sram is
+  generic (
+    mem_file : string
+  );
+  port (
+    cs    : in  std_logic;
+    oe    : in  std_logic;
+    we    : in  std_logic;
+    addr  : in  std_logic_vector(31 downto 0);
+    din   : in  std_logic_vector(31 downto 0);
+    dout  : out std_logic_vector(31 downto 0)
+  );
+end component;
+component not_gate is
+  port (
+    x   : in  std_logic;
+    z   : out std_logic
+  );
+end component;
+component mux_32 is
+  port (
+    sel   : in  std_logic;
+    src0  : in  std_logic_vector(31 downto 0);
+    src1  : in  std_logic_vector(31 downto 0);
+    z       : out std_logic_vector(31 downto 0)
+  );
+end component;
+component data_memory is
+generic(data_mem_file:string);
+port(
+    data_in   : in std_logic_vector(31 downto 0);
+	  addr      : in std_logic_vector(31 downto 0);
+	  we        : in std_logic;
+	  data_out  : out std_logic_vector(31 downto 0)
+      
+);
+end component;
+component instructMem is
+generic (
+		mem_file : string
+	  );
+port(
+		address: in std_logic_vector(31 downto 0):= X"00400020";
+		instruction: out std_logic_vector(31 downto 0)
+	);
+end component;
+
+component PC is 
+port(
+	nextAddress: in std_logic_vector(31 downto 0):=X"00400020";
+	currAddress: out std_logic_vector(31 downto 0):= X"00400020";
+	clk: in std_logic
+	);
+end component;
+
+
+component adder32 is 
+port(
+  A: in std_logic_vector (31 downto 0);
+  B: in std_logic_vector(31 downto 0);
+  carryIn: in std_logic;
+  carryOut: out std_logic;
+  overFlow: out std_logic;
+  result: out std_logic_vector(31 downto 0)
+  );
+
+end component adder32;
+
+component branch_select is
+port(
+opcode : in std_logic_vector(2 downto 0);
+branch : in std_logic;
+beq    : in std_logic;
+bne    : in std_logic;
+bgtz   : in std_logic;
+branch_control : out std_logic);
+end component;
+
+component datamem is
+generic (data_mem_file: string );
+port(
+          data_in   : in std_logic_vector(31 downto 0);
+	  clk       : in std_logic;
+	  addr      : in std_logic_vector(31 downto 0);
+	  we        : in std_logic;
+	  data_out  : out std_logic_vector(31 downto 0)
+      
+);
+end component;
+
+
+
+
+
+--Add the ALU and other components later
+
+
+signal address,nextAddress,PCplus4,temp_read: std_logic_vector(31 downto 0);
+signal inst,Write_data,Read_data1,Read_data2,signextout: std_logic_vector(31 downto 0);
+signal opcode: std_logic_vector(5 downto 0);
+signal Rs,Rt,Rw,Ra,Rb,Rd: std_logic_vector(4 downto 0);
+signal RegDst,ALUSrc,MemtoReg,RegWr,MemWr,MemRead,Jump,ExtOp: std_logic;
+signal ALUop: std_logic_vector(2 downto 0);
+signal Branch: std_logic;
+signal ALUctr: std_logic_vector(2 downto 0);
+signal opA,opB: std_logic_vector(31 downto 0);
+signal immed: std_logic_vector(15 downto 0);
+signal result,Dout:std_logic_vector(31 downto 0);
+signal carryout,overflow,zero_f: std_logic;
+signal func: std_logic_vector(5 downto 0);
+signal shamt: std_logic_vector(31 downto 0);
+signal Ensll,AC:std_logic;-- Ensll is used as a select line for selecting input A or shift amount,AC is a temporary variable
+signal cs: std_logic;
+
+signal branchCtrl:std_logic;
+signal branchAddress: std_logic_vector (31 downto 0);
+
+
+--Declare signals as when required.
+
+begin
+
+opcode<= inst(31 downto 26);--from IFU (yet to be designed)
+Rt<=inst(20 downto 16);
+Rs<=inst(25 downto 21);
+Rd<=inst(15 downto 11);
+Ra<=Rs;
+Rb<=Rt;
+immed<=inst(15 downto 0);
+func<=inst(5 downto 0);
+shamt(4 downto 0)<=inst(10 downto 6);
+shamt(31 downto 5)<= (others=>'0');
+--Read_data1<=opA;
+opA<= Read_data1;
+
+l1: instructMem generic map( mem_file=>mem_file) port map(address,inst);
+l2: main_control port map(opcode,RegDst,ALUSrc,MemtoReg,RegWr,MemWr,Branch,Jump,ExtOp,ALUop);--Getting main control signals from opcode
+l3: mux_n generic map(n=> 5 ) port map(RegDst,Rt,Rd,Rw);-- selecting input for register
+l4: register_file port map(clk,reset,RegWr,Ra,Rb,Rw,Write_data,temp_read,Read_data2);-- output from register file
+
+l5: signExtender port map(immed,signExtout);-- calculating extended output
+l6: ALU_control port map(opcode, func,ALUop,ALUctr);-- calculating alu control signals
+NOR0: nor_gate port map(ALUctr(1),ALUctr(0),AC);
+AND1: and_gate port map(ALUctr(2),AC,Ensll);
+MUX1: mux_32 port map(Ensll,temp_read,shamt,Read_data1);--temp_read is read from data register and MUXd with shamt to produce read_data1 which is given as opA to ALU.
+l7: mux_32 port map(ALUSrc,Read_data2,signExtout,opB);-- selecting operand B for ALU operations
+l8: ALU port map(opA,opB,ALUctr,carryout,overflow,zero_f,result);-- alu values
+l9: not_gate port map(MemWr,MemRead);--generating memory read signal for the memory file
+cs<='1';
+--l10: data_memory generic map(data_mem_file=>mem_file) port map(Read_data2,result,MemWr,Dout);--Writing data to memory
+l10: datamem generic map(data_mem_file=>mem_file) port map(Read_data2,clk,result,MemWr,Dout);
+l11: mux_32 port map(MemtoReg,result,Dout,Write_data);-- selecting which data to write back
+l12: adder32 port map(A=>address,B=>"00000000000000000000000000000100",carryIn=>'0',result=>PCplus4);
+--l13: getJumpAddress port map(inst(15 downto 0),PCplus4,JumpAddress);
+--l14: mux_32 port map(Jump,PCplus4,JumpAddress,nextAddress);  
+l13: branch_select port map(opcode(2 downto 0),Branch,zero_f,zero_f,result(31),branchCtrl);
+l14: adder32 port map(A=> PCplus4, B(31 downto 2) => signExtout(29 downto 0), B(1 downto 0) =>"00", carryIn=>'0', result=> branchAddress );
+l16: mux_32 port map(branchCtrl, PCplus4, branchAddress, nextAddress);
+l15: PC port map(nextAddress,address,clk);
+
+-- Call PC+4 or New address based on jump.
+
+end architecture structural;
+
+
+

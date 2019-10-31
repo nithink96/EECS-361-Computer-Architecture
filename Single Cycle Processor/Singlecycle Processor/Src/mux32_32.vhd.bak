@@ -1,0 +1,134 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+use work.gatesAndConst.all;
+use ieee.numeric_std.all;
+use work.eecs361_gates.all;
+
+entity mux32_32 is
+port(
+sel :  in std_logic_vector(4 downto 0);
+
+reg0 : in std_logic_vector(31 downto 0);
+reg1 : in std_logic_vector(31 downto 0);
+reg2 : in std_logic_vector(31 downto 0);
+reg3 : in std_logic_vector(31 downto 0);
+reg4 : in std_logic_vector(31 downto 0);
+reg5 : in std_logic_vector(31 downto 0);
+reg6 : in std_logic_vector(31 downto 0);
+reg7 : in std_logic_vector(31 downto 0);
+
+reg8 : in std_logic_vector(31 downto 0);
+reg9 : in std_logic_vector(31 downto 0);
+reg10 : in std_logic_vector(31 downto 0);
+reg11 : in std_logic_vector(31 downto 0);
+reg12 : in std_logic_vector(31 downto 0);
+reg13 : in std_logic_vector(31 downto 0);
+reg14 : in std_logic_vector(31 downto 0);
+reg15 : in std_logic_vector(31 downto 0);
+
+reg16 : in std_logic_vector(31 downto 0);
+reg17 : in std_logic_vector(31 downto 0);
+reg18 : in std_logic_vector(31 downto 0);
+reg19 : in std_logic_vector(31 downto 0);
+reg20 : in std_logic_vector(31 downto 0);
+reg21 : in std_logic_vector(31 downto 0);
+reg22 : in std_logic_vector(31 downto 0);
+reg23 : in std_logic_vector(31 downto 0);
+
+reg24 : in std_logic_vector(31 downto 0);
+reg25 : in std_logic_vector(31 downto 0);
+reg26 : in std_logic_vector(31 downto 0);
+reg27 : in std_logic_vector(31 downto 0);
+reg28 : in std_logic_vector(31 downto 0);
+reg29 : in std_logic_vector(31 downto 0);
+reg30 : in std_logic_vector(31 downto 0);
+reg31 : in std_logic_vector(31 downto 0);
+
+output: out std_logic_vector(31 downto 0));
+end mux32_32;
+
+architecture behavioral of mux32_32 is
+
+signal firstlevel0 : std_logic_vector(31 downto 0);
+signal firstlevel1 : std_logic_vector(31 downto 0);
+signal firstlevel2 : std_logic_vector(31 downto 0);
+signal firstlevel3 :  std_logic_vector(31 downto 0);
+signal firstlevel4 : std_logic_vector(31 downto 0);
+signal firstlevel5 : std_logic_vector(31 downto 0);
+signal firstlevel6 : std_logic_vector(31 downto 0);
+signal firstlevel7 : std_logic_vector(31 downto 0);
+
+signal firstlevel8 :  std_logic_vector(31 downto 0);
+signal firstlevel9 : std_logic_vector(31 downto 0);
+signal firstlevel10 :  std_logic_vector(31 downto 0);
+signal firstlevel11 :  std_logic_vector(31 downto 0);
+signal firstlevel12 :  std_logic_vector(31 downto 0);
+signal firstlevel13 :  std_logic_vector(31 downto 0);
+signal firstlevel14 :  std_logic_vector(31 downto 0);
+signal firstlevel15 :  std_logic_vector(31 downto 0);
+
+signal secondlevel0 :  std_logic_vector(31 downto 0);
+signal secondlevel1 :  std_logic_vector(31 downto 0);
+signal secondlevel2 :  std_logic_vector(31 downto 0);
+signal secondlevel3 :  std_logic_vector(31 downto 0);
+signal secondlevel4 :  std_logic_vector(31 downto 0);
+signal secondlevel5 :  std_logic_vector(31 downto 0);
+signal secondlevel6 :  std_logic_vector(31 downto 0);
+signal secondlevel7 :  std_logic_vector(31 downto 0);
+
+signal thirdlevel0 :  std_logic_vector(31 downto 0);
+signal thirdlevel1 :  std_logic_vector(31 downto 0);
+signal thirdlevel2 :  std_logic_vector(31 downto 0);
+signal thirdlevel3 :  std_logic_vector(31 downto 0);
+
+signal forthlevel0 :  std_logic_vector(31 downto 0);
+signal forthlevel1 :  std_logic_vector(31 downto 0);
+
+component mux_32 is
+port (
+         sel   : in  std_logic;
+	src0  : in  std_logic_vector(31 downto 0);
+	src1  : in  std_logic_vector(31 downto 0);
+	z    : out std_logic_vector(31 downto 0)
+);
+end component;
+
+begin
+process1: mux_32 port map (sel(0),reg0,reg1,firstlevel0);
+process2: mux_32 port map (sel(0),reg2,reg3,firstlevel1);
+process3: mux_32 port map (sel(0),reg4,reg5,firstlevel2);
+process4: mux_32 port map (sel(0),reg6,reg7,firstlevel3);
+process5: mux_32 port map (sel(0),reg8,reg9,firstlevel4);
+process6: mux_32 port map (sel(0),reg10,reg11,firstlevel5);
+process7: mux_32 port map (sel(0),reg12,reg13,firstlevel6);
+process8: mux_32 port map (sel(0),reg14,reg15,firstlevel7);
+process9: mux_32 port map (sel(0),reg16,reg17,firstlevel8);
+process10: mux_32 port map (sel(0),reg18,reg19,firstlevel9);
+process11: mux_32 port map (sel(0),reg20,reg21,firstlevel10);
+process12: mux_32 port map (sel(0),reg22,reg23,firstlevel11);
+process13: mux_32 port map (sel(0),reg24,reg25,firstlevel12);
+process14: mux_32 port map (sel(0),reg26,reg27,firstlevel13);
+process15: mux_32 port map (sel(0),reg28,reg29,firstlevel14);
+process16: mux_32 port map (sel(0),reg30,reg31,firstlevel15);
+
+process17: mux_32 port map (sel(1),firstlevel0,firstlevel1,secondlevel0);
+process18: mux_32 port map (sel(1),firstlevel2,firstlevel3,secondlevel1);
+process19: mux_32 port map (sel(1),firstlevel4,firstlevel5,secondlevel2);
+process20: mux_32 port map (sel(1),firstlevel6,firstlevel7,secondlevel3);
+process21: mux_32 port map (sel(1),firstlevel8,firstlevel9,secondlevel4);
+process22: mux_32 port map (sel(1),firstlevel10,firstlevel11,secondlevel5);
+process23: mux_32 port map (sel(1),firstlevel12,firstlevel13,secondlevel6);
+process24: mux_32 port map (sel(1),firstlevel14,firstlevel15,secondlevel7);
+
+process25: mux_32 port map (sel(2),secondlevel0,secondlevel1,thirdlevel0);
+process26: mux_32 port map (sel(2),secondlevel2,secondlevel3,thirdlevel1);
+process27: mux_32 port map (sel(2),secondlevel4,secondlevel5,thirdlevel2);
+process28: mux_32 port map (sel(2),secondlevel6,secondlevel7,thirdlevel3);
+
+process29: mux_32 port map (sel(3),thirdlevel0,thirdlevel1,forthlevel0);
+process30: mux_32 port map (sel(3),thirdlevel2,thirdlevel3,forthlevel1);
+
+process31: mux_32 port map (sel(4),forthlevel0,forthlevel0,output);
+
+end behavioral;
+
